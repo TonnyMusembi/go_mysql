@@ -2,10 +2,11 @@ package main
 
 import (
 	"database/sql"
-	// "fmt"
+	"fmt"
 	"log"
 	"net/http"
-
+	"os"
+	"github.com/joho/godotenv"
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -15,25 +16,38 @@ var db *sql.DB
 
 func main() {
     // Connect to the MySQL database
-    var err error
-    db, err = sql.Open("mysql", "root:tonny@07@tcp(localhost:3306)/movies")
+    
+
+
+err := godotenv.Load()
+    if err != nil {
+        log.Fatal("Error loading .env file:", err)
+    }
+
+    // Retrieve database connection parameters from environment variables
+    dbUser := os.Getenv("DB_USER")
+    dbPass := os.Getenv("DB_PASS")
+    dbHost := os.Getenv("DB_HOST")
+    dbPort := os.Getenv("DB_PORT")
+    dbName := os.Getenv("DB_NAME")
+
+    // Construct the MySQL connection string
+    connectionString := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", dbUser, dbPass, dbHost, dbPort, dbName)
+
+    // Connect to the MySQL database
+    // var err error
+    db, err = sql.Open("mysql", connectionString)
     if err != nil {
         log.Fatal("Error connecting to the database:", err)
     }
-
-    // Ping the database to check if the connection is successful
-    err = db.Ping()
-    if err != nil {
-        log.Fatal("Error pinging database:", err)
-    }
-
-    // Create a new Gin router
-    router := gin.Default()
+    defer db.Close()
+	router := gin.Default()
 
     // Define routes
-    router.GET("/users", getUsers)
     router.POST("/users", addUsers)
-	
+	router.GET("/users", getUsers)
+
+
     // Start the server
     err = router.Run(":8080")
     if err != nil {
