@@ -6,9 +6,10 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"github.com/joho/godotenv"
+
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/joho/godotenv"
 )
 
 // Define a global variable for the database connection
@@ -17,8 +18,6 @@ var db *sql.DB
 func main() {
     // Connect to the MySQL database
     
-
-
 err := godotenv.Load()
     if err != nil {
         log.Fatal("Error loading .env file:", err)
